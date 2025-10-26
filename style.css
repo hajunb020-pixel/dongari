@@ -14,6 +14,12 @@ body {
 
 h1 { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
 
+.description {
+  font-size: 0.95em;
+  color: #cfe9ff;
+  margin: 10px 0;
+}
+
 #gameCanvas {
   background: radial-gradient(circle at center, #111 0%, #000 100%);
   border: 3px solid #00ffff;
