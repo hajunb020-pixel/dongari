@@ -8,7 +8,7 @@ const scoreList = document.getElementById("scoreList");
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
 
-const player = { x: canvas.width/2-20, y: canvas.height-60, width: 40, height: 40, speed: 5 };
+const player = { x: canvas.width/2-20, y: canvas.height-60, width: 40, height: 40, speed: 15 };
 let items = [];
 let score = 0;
 let gameOver = false;
