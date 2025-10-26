@@ -7,17 +7,16 @@ const restartBtn = document.getElementById("restartBtn");
 const scoreList = document.getElementById("scoreList");
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
+const startModal = document.getElementById("startModal");
+const startBtn = document.getElementById("startBtn");
+const modalText = document.getElementById("modalText");
 
-const player = { x: canvas.width/2-20, y: canvas.height-50, width: 40, height: 40, speed: 8 }; // 이동속도 조금 느리게
-let items = [];
-let score = 0;
-let gameOver = false;
-let timeLeft = 60;
-let timerInterval;
+let player = { x: canvas.width/2-20, y: canvas.height-50, width: 40, height: 40, speed: 6 };
+let items = [], score=0, gameOver=false, timeLeft=60, timerInterval;
+let movingLeft=false, movingRight=false;
+let playerName="";
 
-let movingLeft = false;
-let movingRight = false;
-
+// 원소 데이터
 const goodItems = [
   {name:"H₂O", info:"물 — 생명 유지 필수", point:10},
   {name:"O₂", info:"산소 — 호흡과 연료 연소에 필요", point:10},
@@ -59,15 +58,13 @@ document.addEventListener("keyup", e=>{
   if(e.key==="ArrowRight") movingRight=false;
 });
 
-restartBtn.addEventListener("click", restartGame);
-
 // 모바일 버튼
 leftBtn.addEventListener("touchstart", ()=>{ movingLeft=true; });
 leftBtn.addEventListener("touchend", ()=>{ movingLeft=false; });
 rightBtn.addEventListener("touchstart", ()=>{ movingRight=true; });
 rightBtn.addEventListener("touchend", ()=>{ movingRight=false; });
 
-// 모바일 스와이프 & 터치 길게 이동
+// 모바일 스와이프
 let touchStartX = 0;
 canvas.addEventListener("touchstart", e=>{
   touchStartX = e.touches[0].clientX;
@@ -82,7 +79,7 @@ canvas.addEventListener("touchend", e=>{
   movingRight=false;
 });
 
-// 이동
+// 플레이어 업데이트
 function updatePlayer(){
   if(movingLeft) player.x -= player.speed;
   if(movingRight) player.x += player.speed;
@@ -100,7 +97,7 @@ function createItem(){
     y: -30,
     width: 30,
     height: 30,
-    speed: 1.5 + Math.random(), // 조금 더 빠르게
+    speed: 2 + Math.random()*2,
     name: data.name,
     info: data.info,
     isGood: isGood,
@@ -108,7 +105,13 @@ function createItem(){
   });
 }
 
-// 점수판
+// 충돌 체크
+function checkCollision(item){
+  return item.x<player.x+player.width && item.x+item.width>player.x &&
+         item.y<player.y+player.height && item.y+item.height>player.y;
+}
+
+// 점수판 업데이트
 function updateLeaderboard(){
   let scores = JSON.parse(localStorage.getItem("chemScores")||"[]");
   scores.push({name:playerName||"익명", score:score});
@@ -120,12 +123,15 @@ function updateLeaderboard(){
   scores.forEach(s=>scoreList.innerHTML+=`<li>${s.name}: ${s.score}</li>`);
 }
 
+// 게임 종료
 function endGame(){
   gameOver=true;
   clearInterval(timerInterval);
   infoBox.textContent="게임 종료! 다시 시작 버튼을 눌러주세요.";
+  updateLeaderboard();
 }
 
+// 게임 루프
 function updateGame(){
   if(gameOver) return;
 
@@ -136,43 +142,55 @@ function updateGame(){
 
   if(Math.random()<0.03) createItem();
 
-  for(let i=0;i<items.length;i++){
+  for(let i=items.length-1;i>=0;i--){
     const it = items[i];
     it.y += it.speed;
-
     ctx.fillStyle = it.isGood ? "#00ff00" : "#ff3333";
     ctx.font = "bold 16px Arial";
     ctx.fillText(it.name, it.x, it.y);
 
-    if(it.x<player.x+player.width && it.x+it.width>player.x &&
-       it.y<player.y+player.height && it.y+it.height>player.y){
+    if(checkCollision(it)){
       score += it.point;
-      infoBox.textContent=`${it.name}: ${it.info} (${it.point>0?"+":""}${it.point}점)`;
-      items.splice(i,1); i--;
-    } else if(it.y>canvas.height){ items.splice(i,1); i--; }
+      infoBox.textContent=`${it.name}: ${it.info}`;
+      items.splice(i,1);
+    } else if(it.y>canvas.height){
+      items.splice(i,1);
+    }
   }
 
   scoreDisplay.textContent = score;
-  requestAnimationFrame(updateGame);
+  if(!gameOver) requestAnimationFrame(updateGame);
 }
 
-let playerName="";
-function restartGame(){
-  playerName=prompt("플레이어 이름을 입력하세요:","익명")||"익명";
+// 게임 시작
+function startGame(){
+  playerName = prompt("플레이어 이름을 입력하세요:","익명") || "익명";
+  modalText.textContent = `안녕하세요, ${playerName}님!\n좌우로 움직여 좋은 원소(초록색)를 먹어 점수를 올리세요. 나쁜 원소(빨간색)를 먹으면 점수가 떨어집니다. 제한 시간 내 최대 점수를 달성하세요!`;
+  startModal.style.display="block";
+}
+
+// 실제 게임 시작 버튼
+startBtn.addEventListener("click", ()=>{
+  startModal.style.display="none";
   score=0; items=[]; gameOver=false; timeLeft=60;
-  player.x=canvas.width/2-20;
+  player.x = canvas.width/2-20;
   infoBox.textContent="먹은 원소 정보가 여기에 표시됩니다.";
-  timerDisplay.textContent=timeLeft;
+  timerDisplay.textContent = timeLeft;
 
   clearInterval(timerInterval);
   timerInterval = setInterval(()=>{
     timeLeft--;
-    timerDisplay.textContent=timeLeft;
-    if(timeLeft<=0) { endGame(); updateLeaderboard(); }
+    timerDisplay.textContent = timeLeft;
+    if(timeLeft<=0) endGame();
   },1000);
 
   updateGame();
-  updateLeaderboard();
-}
+});
 
-restartGame();
+// 다시 시작 버튼
+restartBtn.addEventListener("click", ()=>{
+  startGame();
+});
+
+// 최초 실행
+startGame();
