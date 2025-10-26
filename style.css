@@ -7,30 +7,20 @@ body {
   align-items: flex-start;
   padding-top: 5px;
 }
-
 .game-container {
   text-align: center;
   width: 90vw;
   max-width: 350px;
 }
-
 h1 { color: #00ffff; text-shadow: 0 0 10px #00ffff; font-size: 1.3em; }
-
-.description {
-  font-size: 0.8em;
-  color: #cfe9ff;
-  margin: 4px 0;
-}
-
+.description { font-size: 0.8em; color: #cfe9ff; margin: 4px 0; }
 #gameCanvas {
   background: radial-gradient(circle at center, #111 0%, #000 100%);
   border: 2px solid #00ffff;
   border-radius: 10px;
   margin-top: 8px;
 }
-
 .score, .timer { font-size: 0.95em; margin-top: 3px; }
-
 #restartBtn {
   margin-top: 8px;
   background-color: #00ffff;
@@ -42,7 +32,6 @@ h1 { color: #00ffff; text-shadow: 0 0 10px #00ffff; font-size: 1.3em; }
   cursor: pointer;
 }
 #restartBtn:hover { background-color: #00bfbf; }
-
 .info-box {
   margin-top: 6px;
   background: rgba(255,255,255,0.1);
@@ -52,7 +41,6 @@ h1 { color: #00ffff; text-shadow: 0 0 10px #00ffff; font-size: 1.3em; }
   font-size: 0.75em;
   min-height: 30px;
 }
-
 .leaderboard {
   margin-top: 10px;
   background: rgba(255,255,255,0.1);
@@ -62,13 +50,9 @@ h1 { color: #00ffff; text-shadow: 0 0 10px #00ffff; font-size: 1.3em; }
   margin-left: auto;
   margin-right: auto;
 }
-
 .leaderboard h2 { font-size: 0.9em; margin-bottom: 4px; }
 .leaderboard ol { text-align: left; padding-left: 12px; margin:0; }
-
-.mobile-controls {
-  margin-top: 6px;
-}
+.mobile-controls { margin-top: 6px; }
 .mobile-controls button {
   font-size: 1.3em;
   margin: 0 12px;
@@ -80,3 +64,28 @@ h1 { color: #00ffff; text-shadow: 0 0 10px #00ffff; font-size: 1.3em; }
   cursor: pointer;
 }
 .mobile-controls button:active { background-color: #00bfbf; }
+
+/* 모달 스타일 */
+.modal {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.9);
+  color: #00ffff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 90%;
+  max-width: 300px;
+  z-index: 10;
+}
+.modal button {
+  margin-top: 10px;
+  background-color: #00ffff;
+  color: black;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal button:active { background-color: #00bfbf; }
