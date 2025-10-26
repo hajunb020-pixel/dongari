@@ -8,7 +8,7 @@ const scoreList = document.getElementById("scoreList");
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
 
-const player = { x: canvas.width/2-20, y: canvas.height-50, width: 40, height: 40, speed: 10 }; // 속도 조절
+const player = { x: canvas.width/2-20, y: canvas.height-50, width: 40, height: 40, speed: 8 }; // 이동속도 조금 느리게
 let items = [];
 let score = 0;
 let gameOver = false;
@@ -36,7 +36,6 @@ const goodItems = [
   {name:"Cu", info:"구리 — 혈액 생성 및 효소 보조", point:12},
 ];
 
-
 const badItems = [
   {name:"CO₂", info:"지구온난화 유발", point:-10},
   {name:"NO₂", info:"대기오염", point:-10},
@@ -50,10 +49,16 @@ const badItems = [
   {name:"CO", info:"일산화탄소 — 치명적", point:-20},
 ];
 
-
 // 키보드 이벤트
-document.addEventListener("keydown", movePlayer);
-document.addEventListener("keyup", stopPlayer);
+document.addEventListener("keydown", e=>{
+  if(e.key==="ArrowLeft") movingLeft=true;
+  if(e.key==="ArrowRight") movingRight=true;
+});
+document.addEventListener("keyup", e=>{
+  if(e.key==="ArrowLeft") movingLeft=false;
+  if(e.key==="ArrowRight") movingRight=false;
+});
+
 restartBtn.addEventListener("click", restartGame);
 
 // 모바일 버튼
@@ -62,27 +67,22 @@ leftBtn.addEventListener("touchend", ()=>{ movingLeft=false; });
 rightBtn.addEventListener("touchstart", ()=>{ movingRight=true; });
 rightBtn.addEventListener("touchend", ()=>{ movingRight=false; });
 
-// 스와이프 터치
-let touchStartX=0;
-canvas.addEventListener("touchstart", e=>{ touchStartX = e.touches[0].clientX; });
+// 모바일 스와이프 & 터치 길게 이동
+let touchStartX = 0;
+canvas.addEventListener("touchstart", e=>{
+  touchStartX = e.touches[0].clientX;
+});
 canvas.addEventListener("touchmove", e=>{
   const touchX = e.touches[0].clientX;
-  if(touchX - touchStartX > 10) movingRight=true, movingLeft=false;
-  if(touchStartX - touchX > 10) movingLeft=true, movingRight=false;
+  if(touchX - touchStartX > 5) { movingRight=true; movingLeft=false; }
+  else if(touchStartX - touchX > 5) { movingLeft=true; movingRight=false; }
 });
-canvas.addEventListener("touchend", ()=>{ movingLeft=false; movingRight=false; });
+canvas.addEventListener("touchend", e=>{
+  movingLeft=false;
+  movingRight=false;
+});
 
-// 키보드
-function movePlayer(e){
-  if(e.key==="ArrowLeft") movingLeft=true;
-  if(e.key==="ArrowRight") movingRight=true;
-}
-function stopPlayer(e){
-  if(e.key==="ArrowLeft") movingLeft=false;
-  if(e.key==="ArrowRight") movingRight=false;
-}
-
-// 이동 적용
+// 이동
 function updatePlayer(){
   if(movingLeft) player.x -= player.speed;
   if(movingRight) player.x += player.speed;
@@ -93,15 +93,14 @@ function updatePlayer(){
 // 아이템 생성
 function createItem(){
   const isGood = Math.random() > 0.5;
-  const data = isGood
-    ? goodItems[Math.floor(Math.random()*goodItems.length)]
-    : badItems[Math.floor(Math.random()*badItems.length)];
+  const data = isGood ? goodItems[Math.floor(Math.random()*goodItems.length)]
+                      : badItems[Math.floor(Math.random()*badItems.length)];
   items.push({
     x: Math.random()*(canvas.width-30),
     y: -30,
     width: 30,
     height: 30,
-    speed: 1.5 + Math.random(), // 조금 빠르게
+    speed: 1.5 + Math.random(), // 조금 더 빠르게
     name: data.name,
     info: data.info,
     isGood: isGood,
@@ -109,7 +108,7 @@ function createItem(){
   });
 }
 
-// 점수판 업데이트
+// 점수판
 function updateLeaderboard(){
   let scores = JSON.parse(localStorage.getItem("chemScores")||"[]");
   scores.push({name:playerName||"익명", score:score});
@@ -157,7 +156,6 @@ function updateGame(){
   requestAnimationFrame(updateGame);
 }
 
-// 게임 시작/재시작
 let playerName="";
 function restartGame(){
   playerName=prompt("플레이어 이름을 입력하세요:","익명")||"익명";
