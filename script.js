@@ -8,7 +8,7 @@ const scoreList = document.getElementById("scoreList");
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
 
-const player = { x: canvas.width/2-20, y: canvas.height-60, width: 40, height: 40, speed: 15 };
+const player = { x: canvas.width/2-20, y: canvas.height-60, width: 40, height: 40, speed: 12 }; // 이동속도 증가
 let items = [];
 let score = 0;
 let gameOver = false;
@@ -42,18 +42,30 @@ const badItems = [
 
 document.addEventListener("keydown", movePlayer);
 restartBtn.addEventListener("click", restartGame);
-leftBtn.addEventListener("touchstart", ()=>{if(!gameOver) moveLeft();});
-rightBtn.addEventListener("touchstart", ()=>{if(!gameOver) moveRight();});
-canvas.addEventListener("touchstart", e=>{touchStartX=e.touches[0].clientX;});
+
+// 모바일 버튼 터치 이동
+leftBtn.addEventListener("touchstart", ()=>{ moveLeft(); });
+rightBtn.addEventListener("touchstart", ()=>{ moveRight(); });
+
+// 모바일 스와이프 이동
+canvas.addEventListener("touchstart", e=>{ touchStartX = e.touches[0].clientX; });
 canvas.addEventListener("touchmove", e=>{
   touchEndX = e.touches[0].clientX;
-  if(touchEndX - touchStartX > 20) moveRight();
-  if(touchStartX - touchEndX > 20) moveLeft();
+  const delta = touchEndX - touchStartX;
+  if(delta > 10) moveRight(); // delta 기준으로 부드러운 이동
+  if(delta < -10) moveLeft();
   touchStartX = touchEndX;
 });
 
-function moveLeft(){ if(player.x>0) player.x-=player.speed; }
-function moveRight(){ if(player.x+player.width<canvas.width) player.x+=player.speed; }
+// 이동 함수
+function moveLeft(){ 
+  player.x -= player.speed;
+  if(player.x < 0) player.x = 0; // 화면 밖 이동 방지
+}
+function moveRight(){ 
+  player.x += player.speed;
+  if(player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+}
 
 function movePlayer(e){
   if(!gameOver){
