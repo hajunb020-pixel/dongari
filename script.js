@@ -11,7 +11,7 @@ const startModal = document.getElementById("startModal");
 const startBtn = document.getElementById("startBtn");
 const modalText = document.getElementById("modalText");
 
-let player = { x: canvas.width/2-20, y: canvas.height-50, width: 40, height: 40, speed: 6 };
+let player = { x: canvas.width/2-20, y: canvas.height-50, width: 40, height: 40, speed: 3 };
 let items = [], score=0, gameOver=false, timeLeft=60, timerInterval;
 let movingLeft=false, movingRight=false;
 let playerName="";
@@ -194,3 +194,4 @@ restartBtn.addEventListener("click", ()=>{
 
 // 최초 실행
 startGame();
+
